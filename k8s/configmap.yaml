@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: backend-config
+  namespace: ian-lagat
+
+data:
+  APP_NAME: "Ian Lagat Capstone"
+  APP_ENV: "production"
+  APP_PORT: "8000"
+  LOG_LEVEL: "INFO"
