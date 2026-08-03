@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-
 from app.api.items import router
 
 from app.core.config import settings
