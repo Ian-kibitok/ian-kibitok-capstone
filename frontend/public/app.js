@@ -1,7 +1,7 @@
 async function loadItems(){
 
     const response = await fetch(
-        "http://localhost:8000/items"
+        "/api/items"
     );
 
     const data = await response.json();
