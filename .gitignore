@@ -45,3 +45,7 @@ backend/.env
 
 # VS Code
 .vscode/
+node_modules/
+dist/
+.env
+.env.local

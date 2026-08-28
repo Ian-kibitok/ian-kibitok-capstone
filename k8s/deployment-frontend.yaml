@@ -18,9 +18,11 @@ spec:
         app: frontend
 
     spec:
+      imagePullSecrets:
+        - name: ecr-registry-secret
       containers:
       - name: frontend
-        image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${FRONTEND_REPOSITORY}:latest
+        image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${FRONTEND_REPOSITORY}:${GITHUB_SHA}
         imagePullPolicy: Always
         resources:
           requests:
@@ -31,3 +33,19 @@ spec:
             memory: "256Mi"
         ports:
           - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 2
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 15
+          periodSeconds: 20
+          timeoutSeconds: 2
+          failureThreshold: 3
