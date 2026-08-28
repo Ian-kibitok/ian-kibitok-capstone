@@ -1,0 +1,47 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Database
+*.db
+
+# Environment files
+.env
+
+# macOS
+.DS_Store
+
+# VS Code
+.vscode/
+
+# Python cache
+.pytest_cache/
+
+# Logs
+*.log
+backend/venv/
+venv/
+backend/.env
+.env
+*.db
+# Python
+backend/venv/
+__pycache__/
+*.pyc
+
+# Environment
+backend/.env
+.env
+
+# Databases
+*.db
+
+# Git
+.git
+
+# macOS
+.DS_Store
+
+# VS Code
+.vscode/
