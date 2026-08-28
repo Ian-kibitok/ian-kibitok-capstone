@@ -15,9 +15,11 @@ spec:
       labels:
         app: backend
     spec:
+      imagePullSecrets:
+        - name: ecr-registry-secret
       containers:
         - name: backend
-          image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${BACKEND_REPOSITORY}:latest
+          image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${BACKEND_REPOSITORY}:${GITHUB_SHA}
           imagePullPolicy: Always
           ports:
             - containerPort: 8000
@@ -26,6 +28,29 @@ spec:
                 name: backend-config
             - secretRef:
                 name: backend-secret
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 20
+            periodSeconds: 30
+            timeoutSeconds: 2
+            failureThreshold: 3
           volumeMounts:
             - name: backend-storage
               mountPath: /app/data

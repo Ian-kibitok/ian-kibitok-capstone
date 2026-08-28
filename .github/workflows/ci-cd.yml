@@ -71,18 +71,23 @@ jobs:
             ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${BACKEND_REPOSITORY}:latest
 
       - name: Push backend image
-        run: docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${BACKEND_REPOSITORY}:latest
+        run: |
+          docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${BACKEND_REPOSITORY}:latest
+          docker tag backend:latest ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${BACKEND_REPOSITORY}:${GITHUB_SHA}
+          docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${BACKEND_REPOSITORY}:${GITHUB_SHA}
 
       - name: Build frontend image
         run: docker build -t frontend ./frontend
 
       - name: Tag frontend image
         run: |
-          docker tag frontend:latest \
-            ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${FRONTEND_REPOSITORY}:latest
+          docker tag frontend:latest ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${FRONTEND_REPOSITORY}:latest
+          docker tag frontend:latest ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${FRONTEND_REPOSITORY}:${GITHUB_SHA}
 
       - name: Push frontend image
-        run: docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${FRONTEND_REPOSITORY}:latest
+        run: |
+          docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${FRONTEND_REPOSITORY}:latest
+          docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${FRONTEND_REPOSITORY}:${GITHUB_SHA}
 
       - name: Install kubectl
         uses: azure/setup-kubectl@v4
@@ -99,6 +104,12 @@ jobs:
       - name: Deploy namespace
         run: kubectl apply -f k8s/namespace.yaml
 
+      - name: Deploy configmap
+        run: kubectl apply -f k8s/configmap.yaml
+
+      - name: Deploy secret
+        run: kubectl apply -f k8s/secret.yaml
+
       - name: Deploy backend
         run: envsubst < k8s/deployment-backend.yaml | kubectl apply -f -
 
@@ -113,6 +124,12 @@ jobs:
 
       - name: Deploy ingress
         run: kubectl apply -f k8s/ingress.yaml
+
+      - name: Wait for backend rollout
+        run: kubectl rollout status deployment/backend -n ian-lagat --timeout=180s
+
+      - name: Wait for frontend rollout
+        run: kubectl rollout status deployment/frontend -n ian-lagat --timeout=180s
 
       - name: Verify deployment
         run: kubectl get all -n ian-lagat

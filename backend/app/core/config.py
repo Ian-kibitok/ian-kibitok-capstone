@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic_settings import BaseSettings
 
 
@@ -7,15 +9,17 @@ class Settings(BaseSettings):
 
     VERSION: str = "1.0.0"
 
-    DATABASE_HOST: str
+    DATABASE_URL: Optional[str] = None
 
-    DATABASE_PORT: int
+    DATABASE_HOST: Optional[str] = None
 
-    DATABASE_NAME: str
+    DATABASE_PORT: Optional[int] = None
 
-    DATABASE_USER: str
+    DATABASE_NAME: Optional[str] = None
 
-    DATABASE_PASSWORD: str
+    DATABASE_USER: Optional[str] = None
+
+    DATABASE_PASSWORD: Optional[str] = None
 
     class Config:
         env_file = ".env"
